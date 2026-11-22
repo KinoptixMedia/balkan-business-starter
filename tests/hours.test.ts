@@ -30,3 +30,11 @@ test("after-midnight closing carries into the next day", () => {
 test("closed all day", () => {
   assert.equal(isOpen(hours, at("2026-11-29T12:00:00Z")), false); // Sun 13:00
 });
+
+test("status tells when it closes or opens next", async () => {
+  const { status } = await import("../lib/hours.ts");
+  assert.deepEqual(status(hours, at("2026-11-23T10:00:00Z")), { open: true, closesAt: "22:00" });
+  assert.deepEqual(status(hours, at("2026-11-23T06:00:00Z")), { open: false, opensDay: "mon", opensAt: "08:00", today: true });
+  assert.deepEqual(status(hours, at("2026-11-29T12:00:00Z")), { open: false, opensDay: "mon", opensAt: "08:00", today: false });
+  assert.deepEqual(status(hours, at("2026-11-28T23:15:00Z")), { open: true, closesAt: "00:30" });
+});

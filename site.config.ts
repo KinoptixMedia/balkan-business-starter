@@ -22,7 +22,16 @@ export const site = {
     "Mali porodični bistro sa domaćom kuhinjom, baštom i doručkom ceo dan. Rezervacije telefonom, WhatsApp-om ili Viber-om.",
   /** Used in titles and descriptions for local search, e.g. "restoran Zemun". */
   seoKeyword: "restoran Zemun",
-  accent: "#2f6b4f",
+  /** Brand colors. `accent` drives buttons and links; `surface` is the page background. */
+  colors: {
+    accent: "#2d5a3a",
+    surface: "#f2f4e4",
+    ink: "#26231e",
+    /** Color of the tablecloth behind the menu (ignored when menuBackdrop is "plain"). */
+    cloth: "#b8322b",
+  },
+  /** "gingham" = checked kafana tablecloth behind the menu. Use "plain" for salons, shops, clinics. */
+  menuBackdrop: "gingham" as "gingham" | "plain",
   currency: "RSD",
 
   contact: {
@@ -55,7 +64,10 @@ export const site = {
     sun: null,
   } satisfies Hours as Hours,
 
+  /** Short label for navigation ("Jelovnik", "Usluge", "Cenovnik"). */
+  servicesNav: "Jelovnik",
   servicesTitle: "Iz naše kuhinje",
+  servicesNote: "Sve se sprema na licu mesta. Za veće grupe pozovite dan ranije.",
   services: [
     { name: "Doručak Lipa", description: "Jaja, kajmak, domaći hleb i sezonsko povrće", price: 690 },
     { name: "Ćevapi sa lepinjom", description: "Deset komada, luk i ajvar", price: 950 },

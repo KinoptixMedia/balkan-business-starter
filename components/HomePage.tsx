@@ -2,43 +2,45 @@ import { site } from "../site.config.ts";
 import { DAYS, DAY_NAMES_SR } from "../lib/hours.ts";
 import { PATHS, localBusinessJsonLd } from "../lib/seo.ts";
 import { scriptT, type Script } from "../lib/translit.ts";
-import { OpenNow } from "./OpenNow.tsx";
+import { OpenNow, TodayMarker } from "./OpenNow.tsx";
 import { ContactForm } from "./ContactForm.tsx";
+import { Leaf } from "./Leaf.tsx";
 
 /** UI strings, written once in Latin. */
 const UI = {
   call: "Pozovi",
-  services: "Usluge",
   gallery: "Galerija",
   hours: "Radno vreme",
-  findUs: "Gde se nalazimo",
+  findUs: "Adresa",
   contact: "Kontakt",
-  closedDay: "Zatvoreno",
-  openNow: "Otvoreno sada",
-  closedNow: "Trenutno zatvoreno",
+  closedDay: "Ne radimo",
   from: "od",
   currency: "din.",
   openMaps: "Otvori u Google mapama",
-  writeUs: "Pišite nam",
+  writeUs: "Pošaljite poruku",
+  writeUsNote: "Za rezervacije, ketering ili pitanja. Odgovaramo istog dana.",
   form: {
-    name: "Ime", contact: "Telefon ili email", message: "Poruka", send: "Pošalji",
-    sending: "Šaljem…", sent: "Hvala! Javićemo vam se uskoro.", error: "Nešto nije u redu. Pozovite nas telefonom.",
+    name: "Ime", contact: "Telefon ili email", message: "Poruka", send: "Pošalji poruku",
+    sending: "Šaljem…", sent: "Poruka je poslata. Javićemo vam se istog dana.",
+    error: "Poruka nije poslata. Pozovite nas telefonom ili pokušajte ponovo.",
   },
+  mainNav: "Glavni meni",
   switchTo: { lat: "Ћирилица", cir: "Latinica" },
 };
 
 export function HomePage({ script }: { script: Script }) {
   const t = scriptT(script);
   const { contact, address } = site;
-  const fullAddress = `${address.street}, ${address.postalCode} ${address.city}`;
   const mapsQuery = encodeURIComponent(
-    address.geo ? `${address.geo.lat},${address.geo.lng}` : `${site.name}, ${fullAddress}`,
+    address.geo ? `${address.geo.lat},${address.geo.lng}` : `${site.name}, ${address.street}, ${address.city}`,
   );
   const wa = `https://wa.me/${contact.phone}`;
   const viber = `viber://chat?number=%2B${contact.phone}`;
   const tel = `tel:+${contact.phone}`;
-  const price = (n: number) => `${n.toLocaleString("sr-RS")} ${t(UI.currency)}`;
+  const price = (n: number) => `${n.toLocaleString("sr-RS")} ${t(UI.currency)}`;
   const other: Script = script === "lat" ? "cir" : "lat";
+  const otherLang = other === "cir" ? "sr-Cyrl" : "sr-Latn";
+  const [featured, ...restGallery] = site.gallery;
 
   return (
     <>
@@ -48,12 +50,15 @@ export function HomePage({ script }: { script: Script }) {
       />
 
       <header className="topbar">
-        <a href={PATHS[script]} className="brand">{t(site.name)}</a>
-        <nav aria-label={t("Glavni meni")}>
-          <a href="#usluge">{t(UI.services)}</a>
+        <a href={PATHS[script]} className="brand">
+          <Leaf className="brand-leaf" />
+          {t(site.name)}
+        </a>
+        <nav aria-label={t(UI.mainNav)}>
+          <a href="#jelovnik">{t(site.servicesNav)}</a>
           <a href="#galerija">{t(UI.gallery)}</a>
           <a href="#kontakt">{t(UI.contact)}</a>
-          <a href={PATHS[other]} hrefLang={other === "cir" ? "sr-Cyrl" : "sr-Latn"} className="script-switch">
+          <a href={PATHS[other]} hrefLang={otherLang} lang={otherLang} className="script-switch">
             {UI.switchTo[script]}
           </a>
         </nav>
@@ -61,74 +66,89 @@ export function HomePage({ script }: { script: Script }) {
 
       <main>
         <section className="hero">
-          <OpenNow hours={site.hours} labels={{ open: t(UI.openNow), closed: t(UI.closedNow) }} />
-          <h1>{t(site.name)}</h1>
-          <p className="lead">{t(site.tagline)}</p>
-          <p>{t(site.description)}</p>
-          <div className="actions">
-            <a className="btn btn-primary" href={tel}>{t(UI.call)} {contact.phoneDisplay}</a>
-            {contact.whatsapp && <a className="btn" href={wa}>WhatsApp</a>}
-            {contact.viber && <a className="btn" href={viber}>Viber</a>}
+          <div className="hero-text">
+            <OpenNow hours={site.hours} script={script} />
+            <h1>{t(site.name)}</h1>
+            <p className="tagline">{t(site.tagline)}</p>
+            <p className="intro">{t(site.description)}</p>
+            <div className="actions">
+              <a className="btn btn-primary" href={tel}>
+                {t(UI.call)} <span className="nowrap">{contact.phoneDisplay}</span>
+              </a>
+              {contact.whatsapp && <a className="btn" href={wa}>WhatsApp</a>}
+              {contact.viber && <a className="btn" href={viber}>Viber</a>}
+            </div>
+          </div>
+          <Leaf className="hero-leaf" />
+        </section>
+
+        <section id="jelovnik" className={`menu-wrap backdrop-${site.menuBackdrop}`}>
+          <div className="menu">
+            <h2>{t(site.servicesTitle)}</h2>
+            {site.servicesNote && <p className="menu-note">{t(site.servicesNote)}</p>}
+            <ul className="menu-list">
+              {site.services.map((s) => (
+                <li key={s.name}>
+                  <div className="menu-line">
+                    <h3>{t(s.name)}</h3>
+                    <span className="leader" aria-hidden />
+                    {s.price !== undefined && (
+                      <span className="price">{s.priceFrom && `${t(UI.from)} `}{price(s.price)}</span>
+                    )}
+                  </div>
+                  {s.description && <p>{t(s.description)}</p>}
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
 
-        <section id="usluge" className="section">
-          <h2>{t(site.servicesTitle)}</h2>
-          <ul className="services">
-            {site.services.map((s) => (
-              <li key={s.name}>
-                <div>
-                  <h3>{t(s.name)}</h3>
-                  {s.description && <p>{t(s.description)}</p>}
-                </div>
-                {s.price !== undefined && (
-                  <span className="price">{s.priceFrom && `${t(UI.from)} `}{price(s.price)}</span>
-                )}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {site.gallery.length > 0 && (
-          <section id="galerija" className="section">
+        {featured && (
+          <section id="galerija" className="block">
             <h2>{t(UI.gallery)}</h2>
             <div className="gallery">
-              {site.gallery.map((g) => (
-                // Plain <img> keeps the site exportable as static HTML for any host.
-                <img key={g.src} src={g.src} alt={t(g.alt)} loading="lazy" width={800} height={600} />
+              {[featured, ...restGallery].map((g, i) => (
+                <figure key={g.src} className={i === 0 ? "g-main" : undefined}>
+                  <img src={g.src} alt={t(g.alt)} loading="lazy" width={800} height={600} />
+                  <figcaption>{t(g.alt)}</figcaption>
+                </figure>
               ))}
             </div>
           </section>
         )}
 
-        <section id="kontakt" className="section grid-2">
+        <section id="kontakt" className="block info">
           <div>
             <h2>{t(UI.hours)}</h2>
             <table className="hours">
               <tbody>
                 {DAYS.map((d) => (
-                  <tr key={d}>
+                  <tr key={d} data-day={d}>
                     <th scope="row">{t(DAY_NAMES_SR[d])}</th>
                     <td>{site.hours[d] ? site.hours[d]!.join("–") : t(UI.closedDay)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            <TodayMarker />
 
             <h2>{t(UI.findUs)}</h2>
             <address>
               {t(address.street)}<br />
-              {address.postalCode} {t(address.city)}<br />
+              {address.postalCode} {t(address.city)}
+            </address>
+            <p className="contact-lines">
               <a href={tel}>{contact.phoneDisplay}</a><br />
               <a href={`mailto:${contact.email}`}>{contact.email}</a>
-            </address>
-            <a className="link" href={`https://www.google.com/maps/search/?api=1&query=${mapsQuery}`}>
-              {t(UI.openMaps)} →
+            </p>
+            <a className="maps-link" href={`https://www.google.com/maps/search/?api=1&query=${mapsQuery}`}>
+              {t(UI.openMaps)}
             </a>
           </div>
 
-          <div>
+          <div className="form-col">
             <h2>{t(UI.writeUs)}</h2>
+            <p className="form-intro">{t(UI.writeUsNote)}</p>
             <ContactForm
               endpoint={contact.formEndpoint}
               email={contact.email}
@@ -149,7 +169,7 @@ export function HomePage({ script }: { script: Script }) {
       </main>
 
       <footer className="footer">
-        <p>© {new Date().getFullYear()} {t(site.name)} · {t(fullAddress)}</p>
+        <p>{t(site.name)}, {t(address.street)}, {t(address.city)}</p>
         <p className="social">
           {Object.entries(site.social).filter(([, url]) => url).map(([name, url]) => (
             <a key={name} href={url} rel="me">{name}</a>

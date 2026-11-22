@@ -23,11 +23,22 @@ that generic themes don't do:
   sticky call bar on phones.
 - **Local SEO by default:** schema.org `LocalBusiness` JSON-LD with address, geo and opening
   hours, sitemap with language alternates, and a configurable local keyword ("restoran Zemun").
-- **Opening hours that work like real ones:** a live "Open now" badge in Belgrade time,
-  including places that close after midnight.
+- **Opening hours that work like real ones:** a live status line in Belgrade time ("Otvoreno do 22:00",
+  "Zatvoreno, otvaramo u ponedeljak u 08:00"), today highlighted in the table, and correct
+  handling of places that close after midnight.
 - **Prices in dinars,** formatted the local way (`1.100 din.`).
 - **Static export:** no server and no database. Host it on Vercel, Netlify, GitHub Pages or plain
   cPanel shared hosting, which is what most local businesses already pay for.
+
+## Design
+
+The demo is a neighbourhood bistro, and the design comes from that world: a pale linden-blossom
+background, a linden leaf as the mark, and the menu as a printed paper card on a checked kafana
+tablecloth, with dotted leaders between dish and price. Type is Alegreya and Alegreya Sans, which
+include Cyrillic with Serbian italic forms, so both versions of the site look the same.
+
+Everything visual comes from `site.config.ts` → `colors`. Set `menuBackdrop: "plain"` for a salon,
+shop or clinic where a tablecloth makes no sense.
 
 ## Quick start
 
