@@ -56,7 +56,9 @@ messages directly, set `contact.formEndpoint` to a Formspree/Basin URL or your o
 
 ## Transliteration library
 
-`lib/translit.ts` is dependency-free and can be used on its own:
+`lib/translit.ts` is dependency-free and can be used on its own. A fuller version with a CLI,
+script detection and custom exceptions lives in
+[sr-latin-cyrillic](https://github.com/KinoptixMedia/sr-latin-cyrillic).
 
 ```ts
 import { toCyrillic, toLatin } from "./lib/translit";
@@ -81,7 +83,7 @@ tests/                 node:test, no extra dependencies (npm test)
 
 ## Roadmap
 
-- [ ] Publish the transliterator as a standalone npm package
+- [x] Transliterator available as a standalone package: [sr-latin-cyrillic](https://github.com/KinoptixMedia/sr-latin-cyrillic)
 - [ ] Bosnian, Croatian and Montenegrin presets (labels, `hreflang`, currency)
 - [ ] Optional English version
 - [ ] More layouts: salon (booking), workshop (before/after gallery), clinic
